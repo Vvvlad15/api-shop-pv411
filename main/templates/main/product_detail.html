@@ -1,0 +1,64 @@
+{% extends 'main/base.html' %}
+
+{% block title %}{{ product.name }} — Інтернет-магазин{% endblock %}
+
+{% block content %}
+<div class="product-detail-container" style="max-width: 900px; margin: 0 auto; padding: 20px;">
+    
+    <div class="product-detail-header" style="margin-bottom: 20px;">
+        <a href="{{ product.category.get_absolute_url }}" style="background: #e2e8f0; padding: 4px 8px; border-radius: 4px; text-decoration: none; color: #4a5568; font-size: 14px;">
+            {{ product.category.name }}
+        </a>
+        <h1 style="margin-top: 15px; margin-bottom: 5px;">{{ product.name }}</h1>
+        <div class="product-meta" style="color: #718096; font-size: 14px;">
+            <span style="margin-right: 15px;">Додано: {{ product.created_at|date:"d.m.Y" }}</span>
+            <span>👁️ {{ product.views }} переглядів</span>
+        </div>
+    </div>
+
+    <div class="product-detail-main" style="display: flex; gap: 30px; margin-bottom: 40px;">
+        <div class="product-image-large" style="flex: 1;">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0;" />
+            {% else %}
+                <div style="height: 300px; background: #eee; display: flex; align-items: center; justify-content: center; color: #777; border-radius: 8px;">Зображення відсутнє</div>
+            {% endif %}
+        </div>
+
+        <div class="product-info-block" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div class="product-price" style="font-size: 28px; font-weight: bold; color: #2d3748; margin-bottom: 15px;">
+                    {{ product.price }} грн
+                </div>
+                <div class="product-description" style="line-height: 1.6; color: #4a5568;">
+                    <h3 style="color: #2d3748; margin-bottom: 5px;">Опис товару:</h3>
+                    <p>{{ product.description|default:"Опис відсутній."|linebreaks }}</p>
+                </div>
+            </div>
+            <a href="{% url 'main:product_list' %}" style="margin-top: 20px; display: inline-block; color: #007bff; text-decoration: none;">← Назад до каталогу</a>
+        </div>
+    </div>
+
+    <!-- Блок похожих товаров -->
+    {% if related_products %}
+    <div class="related-products-section" style="border-top: 1px solid #e2e8f0; padding-top: 30px;">
+        <h2 style="margin-bottom: 20px; color: #2d3748;">Схожі товари</h2>
+        <div class="products-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+            {% for related in related_products %}
+            <div class="product-card" style="border: 1px solid #e2e8f0; padding: 10px; border-radius: 6px; text-align: center;">
+                <a href="{{ related.get_absolute_url }}" style="text-decoration: none; color: inherit;">
+                    {% if related.image %}
+                        <img src="{{ related.image.url }}" alt="{{ related.name }}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 4px;" />
+                    {% else %}
+                        <div style="height: 100px; background: #eee; display: flex; align-items: center; justify-content: center; color: #777; font-size: 12px;">Немає фото</div>
+                    {% endif %}
+                    <h4 style="margin: 8px 0 4px 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ related.name }}</h4>
+                    <span class="price" style="font-weight: bold; color: #4a5568; font-size: 14px;">{{ related.price }} грн</span>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
