@@ -1,0 +1,37 @@
+{% extends 'main/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+
+    <!-- Меню категорий -->
+    <div class="categories-menu" style="margin-bottom: 20px;">
+        <a href="{% url 'main:product_list' %}" style="margin-right: 15px; font-weight: {% if not category %}bold{% else %}normal{% endif %};">Всі товари</a>
+        {% for cat in categories %}
+            <a href="{{ cat.get_absolute_url }}" style="margin-right: 15px; font-weight: {% if category.slug == cat.slug %}bold{% else %}normal{% endif %};">
+                {{ cat.name }}
+            </a>
+        {% endfor %}
+    </div>
+
+    <!-- Список товаров -->
+    {% if products %}
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+            {% for product in products %}
+                <div style="border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-width: 100%; height: 150px; object-fit: cover; border-radius: 4px;" />
+                    {% else %}
+                        <div style="height: 150px; background: #eee; display: flex; align-items: center; justify-content: center; color: #777;">Зображення відсутнє</div>
+                    {% endif %}
+                    <h3>{{ product.name }}</h3>
+                    <p><strong>Ціна:</strong> {{ product.price }} грн.</p>
+                    <p>{{ product.description|default_if_none:"" }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Наразі товарів немає в цій категорії.</p>
+    {% endif %}
+{% endblock %}
