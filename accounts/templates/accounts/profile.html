@@ -1,15 +1,29 @@
 {% extends 'main/base.html' %}
+<!-- 1. Завантажуємо наші кастомні фільтри та теги -->
+{% load account_filters account_tags %}
 
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<div style="max-width: 400px; margin: 40px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; background: #f9f9f9;">
-    <h2>{{ title }}</h2>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" style="background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; width: 100%;">Зареєструватися</button>
-    </form>
-    <p style="margin-top: 15px; text-align: center;">Вже є акаунт? <a href="{% url 'accounts:login' %}">Увійти</a></p>
+<div style="max-width: 600px; margin: 30px auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff;">
+    <h2>Мій Профіль</h2>
+    <hr>
+    <div style="line-height: 2;">
+        <p><strong>Ім'я користувача:</strong> {{ user.username }}</p>
+        <p><strong>Email-адреса:</strong> {{ user.email|default:"Не вказано" }}</p>
+        
+        <!-- 2. Використовуємо наш тег days_on_site біля дати реєстрації -->
+        <p><strong>Дата реєстрації:</strong> {{ user.date_joined|date:"d.m.Y H:i" }} ({% days_on_site user.date_joined %})</p>
+        
+        <p><strong>Останній вхід:</strong> {{ user.last_login|date:"d.m.Y H:i" }}</p>
+        
+        <!-- 3. Використовуємо наш фільтр user_role для виведення ролі -->
+        <p><strong>Роль на сайті:</strong> <span class="profile-role" style="font-weight: bold;">{{ user|user_role }}</span></p>
+    </div>
+    <hr style="margin-top: 20px; margin-bottom: 20px;">
+    <div style="display: flex; gap: 15px;">
+        <a href="{% url 'main:product_list' %}" style="display: inline-block; background: #6c757d; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px;">← До каталогу</a>
+        <a href="{% url 'accounts:logout' %}" style="display: inline-block; background: #dc3545; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px;">Вийти з акаунту</a>
+    </div>
 </div>
 {% endblock %}
