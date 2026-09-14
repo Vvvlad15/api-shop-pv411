@@ -1,0 +1,30 @@
+{% extends 'main/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 40px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; background: #f9f9f9;">
+    <h2>{{ title }}</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div style="color: red; margin-bottom: 15px;">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div style="margin-bottom: 15px;">
+            <label>Ім'я користувача:</label><br>
+            {{ form.username }}
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label>Пароль:</label><br>
+            {{ form.password }}
+        </div>
+
+        <button type="submit" style="background: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; width: 100%;">Увійти</button>
+    </form>
+    <p style="margin-top: 15px; text-align: center;">Немає акаунту? <a href="{% url 'accounts:register' %}">Зареєструватися</a></p>
+</div>
+{% endblock %}

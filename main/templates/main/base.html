@@ -5,22 +5,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Мій Магазин{% endblock %}</title>
-    <!-- Подключаем наш будущий файл стилей -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <header>
-        <h1>🛒 My API Shop</h1>
-        <hr>
+    <header style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #f8f9fa; border-bottom: 1px solid #e3e6f0;">
+        <h1><a href="{% url 'main:product_list' %}" style="text-decoration: none; color: inherit;">🛒 My API Shop</a></h1>
+        
+        <!-- Блок авторизации пользователя (Новый функционал ДЗ-09) -->
+        <div class="auth-menu">
+            {% if user.is_authenticated %}
+                <span style="margin-right: 15px;">Вітаємо, <strong><a href="{% url 'accounts:profile' %}">{{ user.username }}</a></strong>!</span>
+                {% if user.is_staff %}
+                    <a href="{% url 'admin:index' %}" style="margin-right: 15px; color: #4e73df; text-decoration: none;">Адмінка</a>
+                {% endif %}
+                <a href="{% url 'accounts:logout' %}" style="color: #e74a3b; text-decoration: none;">Вийти</a>
+            {% else %}
+                <a href="{% url 'accounts:login' %}" style="margin-right: 15px; text-decoration: none; color: #4e73df;">Вхід</a>
+                <a href="{% url 'accounts:register' %}" style="background: #28a745; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px;">Реєстрація</a>
+            {% endif %}
+        </div>
     </header>
+    <hr style="margin: 0;">
 
-    <main>
+    <main style="padding: 20px;">
         {% block content %}
         {% endblock %}
     </main>
 
-    <footer>
-        <hr>
+    <footer style="padding: 20px; text-align: center; background: #f8f9fa; border-top: 1px solid #e3e6f0; margin-top: 40px;">
         <p>&copy; 2026 Всі права захищені.</p>
     </footer>
 </body>
