@@ -1,29 +1,54 @@
 {% extends 'main/base.html' %}
-<!-- 1. Завантажуємо наші кастомні фільтри та теги -->
 {% load account_filters account_tags %}
 
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<div style="max-width: 600px; margin: 30px auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff;">
+<div style="max-width: 600px; margin: 30px auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; position: relative;">
+    
+    <!-- Блок виведення повідомлень про успіх (messages) -->
+    {% if messages %}
+        {% for message in messages %}
+            <div style="padding: 10px 15px; margin-bottom: 20px; border-radius: 4px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; font-weight: bold;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
     <h2>Мій Профіль</h2>
     <hr>
-    <div style="line-height: 2;">
-        <p><strong>Ім'я користувача:</strong> {{ user.username }}</p>
-        <p><strong>Email-адреса:</strong> {{ user.email|default:"Не вказано" }}</p>
-        
-        <!-- 2. Використовуємо наш тег days_on_site біля дати реєстрації -->
-        <p><strong>Дата реєстрації:</strong> {{ user.date_joined|date:"d.m.Y H:i" }} ({% days_on_site user.date_joined %})</p>
-        
-        <p><strong>Останній вхід:</strong> {{ user.last_login|date:"d.m.Y H:i" }}</p>
-        
-        <!-- 3. Використовуємо наш фільтр user_role для виведення ролі -->
-        <p><strong>Роль на сайті:</strong> <span class="profile-role" style="font-weight: bold;">{{ user|user_role }}</span></p>
+    
+    <!-- Отображение Аватара пользователя -->
+    <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px;">
+        <div class="profile-avatar">
+            {% if user.profile.avatar %}
+                <img src="{{ user.profile.avatar.url }}" alt="Аватар" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; border: 2px solid #ccc;" />
+            {% else %}
+                <div style="width: 100px; height: 100px; background: #eee; display: flex; align-items: center; justify-content: center; color: #777; border-radius: 50%; border: 2px solid #ccc; font-size: 12px; text-align: center;">Немає<br>фото</div>
+            {% endif %}
+        </div>
+        <div>
+            <h3 style="margin: 0;">{{ user.first_name }} {{ user.last_name }}</h3>
+            <p style="margin: 5px 0 0 0; color: #666;">@{{ user.username }}</p>
+        </div>
     </div>
+
+    <div style="line-height: 2;">
+        <p><strong>Email-адреса:</strong> {{ user.email|default:"Не вказано" }}</p>
+        <p><strong>Місто:</strong> {{ user.profile.location|default:"Не вказано" }}</p>
+        <p><strong>Веб-сайт:</strong> {% if user.profile.website %}<a href="{{ user.profile.website }}" target="_blank">{{ user.profile.website }}</a>{% else %}Не вказано{% endif %}</p>
+        <p><strong>Дата народження:</strong> {{ user.profile.birth_date|date:"d.m.Y"|default:"Не вказано" }}</p>
+        <p><strong>Про себе:</strong> {{ user.profile.bio|default:"Інформація відсутня." }}</p>
+        <p><strong>Дата реєстрації:</strong> {{ user.date_joined|date:"d.m.Y H:i" }} ({% days_on_site user.date_joined %})</p>
+        <p><strong>Роль на сайті:</strong> <span style="font-weight: bold;">{{ user|user_role }}</span></p>
+    </div>
+    
     <hr style="margin-top: 20px; margin-bottom: 20px;">
+    
     <div style="display: flex; gap: 15px;">
+        <!-- КНОПКА РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
+        <a href="{% url 'accounts:profile_edit' %}" style="display: inline-block; background: #4e73df; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-weight: bold;">Редагувати профіль</a>
         <a href="{% url 'main:product_list' %}" style="display: inline-block; background: #6c757d; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px;">← До каталогу</a>
-        <a href="{% url 'accounts:logout' %}" style="display: inline-block; background: #dc3545; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px;">Вийти з акаунту</a>
     </div>
 </div>
 {% endblock %}
