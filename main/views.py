@@ -1,3 +1,6 @@
+from django.core.mail import send_mail
+from django.contrib import messages
+from .forms import ContactForm
 from django.shortcuts import render, get_object_or_404
 from django.db.models import F
 from .models import Product, Category
@@ -64,3 +67,46 @@ def product_detail(request, id, slug):
         "related_products": related_products,
     }
     return render(request, "main/product_detail.html", context)
+def contact_view(request):
+    """Обробка форми зворотного зв'язку та надсилання email адміністратору"""
+    categories = Category.objects.all() # для навігації у base.html
+    
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            # Отримуємо очищені та безпечні дані з форми
+            cd = form.cleaned_data
+            
+            # Формуємо красивий текст листа для адміна
+            subject = f"Зворотний зв'язок: {cd['subject']}"
+            message_body = (
+                f"Отримано нове повідомлення з форми контактів.\n\n"
+                f"Відправник: {cd['name']}\n"
+                f"Email відправника: {cd['email']}\n\n"
+                f"Текст повідомлення:\n{cd['message']}"
+            )
+            
+            try:
+                # Надсилаємо лист (відправник, отримувач)
+                send_mail(
+                    subject,
+                    message_body,
+                    cd['email'], # email користувача
+                    ['admin@api-shop.com'], # email адміністратора сайту
+                    fail_silently=False,
+                )
+                messages.success(request, "Ваше повідомлення успішно надіслано адміністратору!")
+                return redirect('main:contact') # Патерн Post/Redirect/Get
+                
+            except Exception as e:
+                # Обробка помилок поштового сервера
+                messages.error(request, f"Виникла помилка при відправці листа: {e}")
+    else:
+        form = ContactForm()
+        
+    context = {
+        'form': form,
+        'categories': categories,
+        'title': 'Зворотний зв\'язок (Контакти)'
+    }
+    return render(request, 'main/contact.html', context)
