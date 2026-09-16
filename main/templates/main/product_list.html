@@ -29,21 +29,37 @@
     {% if products %}
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
             {% for product in products %}
-                <div style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; position: relative;">
-                    <!-- Картинка-ссылка -->
-                    <a href="{{ product.get_absolute_url }}">
-                        {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px;" />
-                        {% else %}
-                            <div style="height: 150px; background: #eee; display: flex; align-items: center; justify-content: center; color: #777;">Зображення відсутнє</div>
-                        {% endif %}
-                    </a>
+                <!-- Главный блок карточки (теперь всё внутри него) -->
+                <div style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; position: relative; display: flex; flex-direction: column; justify-content: space-between; background: #fff;">
                     
-                    <!-- Название-ссылка -->
-                    <h3><a href="{{ product.get_absolute_url }}" style="color: #333; text-decoration: none;">{{ product.name }}</a></h3>
-                    <p><strong>Ціна:</strong> {{ product.price }} грн.</p>
-                    <small style="color: #777; display: block; margin-bottom: 10px;">👁️ {{ product.views }} переглядів</small>
-                    <a href="{{ product.get_absolute_url }}" style="display: inline-block; background: #007bff; color: #fff; padding: 5px 10px; text-decoration: none; border-radius: 4px; font-size: 14px;">Детальніше</a>
+                    <div>
+                        <!-- Картинка-ссылка -->
+                        <a href="{{ product.get_absolute_url }}" style="display: block; margin-bottom: 10px;">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px;" />
+                            {% else %}
+                                <div style="height: 150px; background: #eee; display: flex; align-items: center; justify-content: center; color: #777; border-radius: 4px;">Зображення відсутнє</div>
+                            {% endif %}
+                        </a>
+                        
+                        <!-- Название-ссылка -->
+                        <h3 style="margin: 10px 0;"><a href="{{ product.get_absolute_url }}" style="color: #333; text-decoration: none;">{{ product.name }}</a></h3>
+                        <p style="margin: 5px 0;"><strong>Ціна:</strong> {{ product.price }} грн.</p>
+                        <small style="color: #777; display: block; margin-bottom: 10px;">👁️ {{ product.views }} переглядів</small>
+                    </div>
+
+                    <!-- Блок с кнопками управления в самом низу карточки -->
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: auto;">
+                        <a href="{{ product.get_absolute_url }}" style="text-align: center; display: block; background: #007bff; color: #fff; padding: 6px 10px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: bold;">Детальніше</a>
+                        
+                        <!-- Форма добавления в корзину (теперь стоит правильно внутри карточки) (ДЗ-13) -->
+                        <form action="{% url 'main:cart_add' product.id %}" method="POST" style="margin: 0; width: 100%;">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" style="background: #28a745; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; width: 100%;">Купити 🛒</button>
+                        </form>
+                    </div>
+
                 </div>
             {% endfor %}
         </div>

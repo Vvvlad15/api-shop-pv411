@@ -1,9 +1,11 @@
 from django.core.mail import send_mail
 from django.contrib import messages
 from .forms import ContactForm
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import F
 from .models import Product, Category
+from django.views.decorators.http import require_POST
+from .cart import Cart
 
 def product_list(request, category_slug=None):
     """Список товаров со встроенной сортировкой и оптимизацией запросов"""
@@ -110,3 +112,34 @@ def contact_view(request):
         'title': 'Зворотний зв\'язок (Контакти)'
     }
     return render(request, 'main/contact.html', context)
+@require_POST
+def cart_add(request, product_id):
+    """Додавання або оновлення кількості товару в кошику"""
+    cart = Cart(request)
+    product = get_object_or_404(Product, id=product_id)
+    
+    # Отримуємо кількість з форми (за замовчуванням 1)
+    quantity = int(request.POST.get('quantity', 1))
+    # Перевіряємо, чи потрібно перезаписати кількість (наприклад, зсередини кошика)
+    override = request.POST.get('override', 'False') == 'True'
+    
+    cart.add(product=product, quantity=quantity, override_quantity=override)
+    return redirect('main:cart_detail')
+
+
+def cart_remove(request, product_id):
+    """Видалення позиції з кошика"""
+    cart = Cart(request)
+    product = get_object_or_404(Product, id=product_id)
+    cart.remove(product)
+    return redirect('main:cart_detail')
+
+
+def cart_detail(request):
+    """Відображення вмісту кошика"""
+    categories = Category.objects.all()
+    context = {
+        'title': 'Ваш кошик покупок',
+        'categories': categories,
+    }
+    return render(request, 'main/cart_detail.html', context)

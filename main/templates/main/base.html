@@ -9,6 +9,7 @@
 </head>
 <body>
     <header style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #f8f9fa; border-bottom: 1px solid #e3e6f0;">
+        <a href="{% url 'main:cart_detail' %}" style="margin-right: 20px; text-decoration: none; color: #28a745; font-weight: bold;">🛒 Кошик ({{ cart|length }})</a>
         <h1><a href="{% url 'main:product_list' %}" style="text-decoration: none; color: inherit;">🛒 My API Shop</a></h1>
         
         <!-- Блок авторизации пользователя (Новый функционал ДЗ-09) -->
